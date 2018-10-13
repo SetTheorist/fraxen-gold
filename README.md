@@ -1,2 +1,2 @@
 # fraxen-gold
-Simple roguelike written in Kit language
+Simple roguelike for programming practice

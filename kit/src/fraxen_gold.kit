@@ -1,0 +1,54 @@
+
+
+struct Point2d {
+    public var x: Int32;
+    public var y: Int32;
+}
+
+rules Point2dRules {
+    (${a:Point2d} + ${b:Point2d}) => struct Point2d{x:a.x+b.x, y:a.y+b.y};
+    (${a:Point2d} - ${b:Point2d}) => struct Point2d{x:a.x-b.x, y:a.y-b.y};
+}
+
+struct Rect2d {
+    public var bl: Point2d;
+    public var tr: Point2d;
+}
+
+rules Rect2dRules {
+    (${a:Rect2d} + ${b:Point2d}) => struct Rect2d{bl:a.bl+b, tr:a.tr+b};
+    (${a:Rect2d} - ${b:Point2d}) => struct Rect2d{bl:a.bl-b, tr:a.tr-b};
+}
+
+struct Rect2dIterator {
+    var rect: Rect2d;
+    var next: Point2d;
+}
+
+implement Iterable(Point2d) for Rect2d {
+    public function iterator(): Box[Rect2dIterator] {
+        return Box(struct Rect2dIterator { rect:this, next:this.bl });
+    }
+}
+
+implement Iterator(Point2d) for Rect2dIterator {
+    public function next(): (Box[Iterator[Point2d]], Option[Point2d]) {
+    //public function next(): (Box[Rect2dIterator], Option[Point2d]) {
+    }
+}
+
+
+function main() {
+    using rules Point2dRules {
+        var a = struct Point2d{x:0,y:1};
+        var b = struct Point2d{x:2,y:3};
+        var c = a + b;
+        printf("(%i,%i)+(%i,%i)=(%i,%i)\n", a.x, a.y, b.x, b.y, c.x, c.y);
+    }
+    var r = struct Rect2d{bl:struct Point2d{x:0,y:0}, tr:struct Point2d{x:2,y:3}};
+    for p in r {
+        printf("(%i,%i)", p.x, p.y);
+    }
+    printf("\n");
+}
+
